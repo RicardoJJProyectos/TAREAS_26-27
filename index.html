@@ -278,22 +278,33 @@
     let isProcessing = false;
     let baseDatosAlumnos = []; // Almacena datos descargados de Google Sheets
 
-    function playBeep() {
-      try {
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "sine";
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.15);
-      } catch (e) {
-        if (navigator.vibrate) navigator.vibrate(120);
-      }
-    }
+    function playBeep()  {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const notas = [
+          { f: 880.00, d: 0.1 },  // A5
+          { f: 987.77, d: 0.1 },  // B5
+          { f: 1046.50, d: 0.1 }, // C6
+          { f: 1174.66, d: 0.4 }  // D6
+          ];
+
+  let now = ctx.currentTime;
+  notas.forEach(n => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(n.f, now);
+    
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.01, now + n.d);
+    
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    
+    osc.start(now);
+    osc.stop(now + n.d);
+    now += n.d;
+  });
+}
 
     function showStatus(message, type, alumnoName = "") {
       const box = document.getElementById('status-box');
@@ -380,34 +391,7 @@
       .then(response => response.json())
       .then(res => {
         if (res.success) {
-          //playBeep();
-          function playSonidoZeldaObjeto() {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const notas = [
-          { f: 880.00, d: 0.1 },  // A5
-          { f: 987.77, d: 0.1 },  // B5
-          { f: 1046.50, d: 0.1 }, // C6
-          { f: 1174.66, d: 0.4 }  // D6
-          ];
-
-  let now = ctx.currentTime;
-  notas.forEach(n => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(n.f, now);
-    
-    gain.gain.setValueAtTime(0.25, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + n.d);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start(now);
-    osc.stop(now + n.d);
-    now += n.d;
-  });
-}
+          playBeep();
           showStatus(`✅ <strong>${res.actividad}</strong> asignada en <strong>${res.hoja}</strong>`, "success", res.alumno);
           setTimeout(() => { isProcessing = false; }, 1800);
         } else {
