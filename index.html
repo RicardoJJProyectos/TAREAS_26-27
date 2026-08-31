@@ -38,7 +38,7 @@
       padding-bottom: 20px;
     }
 
-    /* BANNER DE NOTIFICACIÓN FIJO EN LA PARTE SUPERIOR */
+    /* BANNER DE NOTIFICACIÓN FIJO */
     .status-container {
       position: sticky;
       top: 0;
@@ -76,7 +76,6 @@
       margin-top: 4px;
     }
 
-    /* TARJETA PRINCIPAL */
     .main-card {
       background: var(--card-bg);
       width: calc(100% - 30px);
@@ -123,7 +122,6 @@
       border-color: var(--primary);
     }
 
-    /* PESTAÑAS Y NAVEGACIÓN */
     .nav-tabs {
       display: flex;
       background: #e8eaed;
@@ -166,11 +164,6 @@
       background-color: #000;
     }
 
-    #reader video {
-      object-fit: cover !important;
-    }
-
-    /* BOTONES DE ACCIÓN */
     .btn-primary {
       width: 100%;
       padding: 14px;
@@ -183,6 +176,7 @@
       cursor: pointer;
       transition: background 0.2s;
       box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
+      margin-top: 5px;
     }
 
     .btn-primary:active {
@@ -200,7 +194,7 @@
 </head>
 <body>
 
-  <!-- Mensaje de Confirmación Fijo (Arriba) -->
+  <!-- Mensaje de Confirmación Fijo -->
   <div class="status-container">
     <div id="status-box"></div>
   </div>
@@ -237,27 +231,41 @@
       <option value="PART">PART</option>
     </select>
 
-    <!-- Selector de Modo: QR vs Manual -->
+    <!-- Navegación QR / Manual -->
     <div class="nav-tabs">
       <button class="tab-btn active" onclick="switchTab('qr-tab', this)">📷 Cámara QR</button>
-      <button class="tab-btn" onclick="switchTab('manual-tab', this)">✏️ Registro Manual</button>
+      <button class="tab-btn" onclick="switchTab('manual-tab', this)">✏️ Búsqueda Manual</button>
     </div>
 
-    <!-- PESTAÑA 1: Escáner QR -->
+    <!-- PESTAÑA 1: Cámara QR -->
     <div id="qr-tab" class="tab-content active">
       <div id="reader"></div>
-
       <div class="file-input-wrapper">
         <label for="qr-input-file">📷 Cargar Foto de Código QR</label>
         <input type="file" id="qr-input-file" accept="image/*" capture="environment">
       </div>
     </div>
 
-    <!-- PESTAÑA 2: Registro Manual -->
+    <!-- PESTAÑA 2: Búsqueda Manual por Grupo/Alumno -->
     <div id="manual-tab" class="tab-content">
-      <label for="manualNombre">Nombre completo del Alumno:</label>
-      <input type="text" id="manualNombre" placeholder="Ej: RICARDO JIMENEZ JIMENEZ" autocomplete="off">
-      <button class="btn-primary" onclick="registrarManual()">✅ Registrar Tarea</button>
+      
+      <!-- Filtro 1: Grupo / Pestaña -->
+      <label for="grupoSelect">2. Seleccionar Grupo / Pestaña</label>
+      <select id="grupoSelect" onchange="filtrarAlumnos()">
+        <option value="">-- Cargando grupos... --</option>
+      </select>
+
+      <!-- Filtro 2: Escribir para buscar -->
+      <label for="buscarNombreInput">3. Buscar Alumno (Escribe nombre):</label>
+      <input type="text" id="buscarNombreInput" placeholder="Ej. Ricardo..." oninput="filtrarAlumnos()">
+
+      <!-- Lista desplegable de Alumnos filtrados -->
+      <label for="alumnoListaSelect">4. Alumnos Encontrados:</label>
+      <select id="alumnoListaSelect" size="5" style="height: 140px; margin-bottom: 12px;">
+        <option value="">Cargando lista...</option>
+      </select>
+
+      <button class="btn-primary" onclick="registrarManual()">✅ Registrar Tarea Alumno Seleccionado</button>
     </div>
 
   </div>
@@ -268,6 +276,7 @@
 
     let html5QrCode;
     let isProcessing = false;
+    let baseDatosAlumnos = []; // Almacena datos descargados de Google Sheets
 
     function playBeep() {
       try {
@@ -298,6 +307,64 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // DESCARGAR LISTA DE ALUMNOS DESDE APPS SCRIPT
+    function cargarDirectorioAlumnos() {
+      fetch(SCRIPT_URL)
+        .then(response => response.json())
+        .then(res => {
+          if (res.success && res.datos) {
+            baseDatosAlumnos = res.datos;
+            poblardesplegableGrupos();
+            filtrarAlumnos();
+          }
+        })
+        .catch(err => console.error("Error al cargar lista de alumnos:", err));
+    }
+
+    function poblardesplegableGrupos() {
+      const selectGrupo = document.getElementById('grupoSelect');
+      selectGrupo.innerHTML = '<option value="TODOS">--- Todos los Grupos ---</option>';
+      
+      baseDatosAlumnos.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.grupo;
+        opt.textContent = `📁 ${item.grupo} (${item.alumnos.length} alumnos)`;
+        selectGrupo.appendChild(opt);
+      });
+    }
+
+    function filtrarAlumnos() {
+      const grupoSeleccionado = document.getElementById('grupoSelect').value;
+      const textoBusqueda = document.getElementById('buscarNombreInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+      const selectAlumnos = document.getElementById('alumnoListaSelect');
+      selectAlumnos.innerHTML = '';
+
+      let contador = 0;
+
+      baseDatosAlumnos.forEach(item => {
+        // Si hay grupo seleccionado y no coincide, saltar
+        if (grupoSeleccionado && grupoSeleccionado !== "TODOS" && item.grupo !== grupoSeleccionado) return;
+
+        item.alumnos.forEach(nombre => {
+          const nombreLimpio = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (!textoBusqueda || nombreLimpio.includes(textoBusqueda)) {
+            const opt = document.createElement('option');
+            opt.value = `${nombre}|${item.grupo}`;
+            opt.textContent = `${nombre} [${item.grupo}]`;
+            selectAlumnos.appendChild(opt);
+            contador++;
+          }
+        });
+      });
+
+      if (contador === 0) {
+        const opt = document.createElement('option');
+        opt.value = "";
+        opt.textContent = "Sin coincidencias";
+        selectAlumnos.appendChild(opt);
+      }
+    }
+
     function sendDataToSheets(qrData) {
       if (isProcessing) return;
       isProcessing = true;
@@ -315,8 +382,6 @@
         if (res.success) {
           playBeep();
           showStatus(`✅ <strong>${res.actividad}</strong> asignada en <strong>${res.hoja}</strong>`, "success", res.alumno);
-          
-          // Pausa de 1.8 segundos antes de permitir el siguiente escaneo
           setTimeout(() => { isProcessing = false; }, 1800);
         } else {
           showStatus(`⚠️ ${res.message}`, "error");
@@ -330,14 +395,15 @@
     }
 
     function registrarManual() {
-      const input = document.getElementById('manualNombre');
-      const nombre = input.value.trim();
-      if (!nombre) {
-        showStatus("⚠️ Ingrese el nombre del alumno para registrar.", "error");
+      const selectAlumnos = document.getElementById('alumnoListaSelect');
+      const valorSeleccionado = selectAlumnos.value;
+      
+      if (!valorSeleccionado) {
+        showStatus("⚠️ Por favor selecciona un alumno de la lista.", "error");
         return;
       }
-      sendDataToSheets(nombre);
-      input.value = ""; // Limpiar campo tras enviar
+
+      sendDataToSheets(valorSeleccionado);
     }
 
     function switchTab(tabId, btnElement) {
@@ -361,13 +427,12 @@
         html5QrCode = new Html5Qrcode("reader");
       }
 
-      // Configuración de escaneo rápido
       const config = {
         fps: 25, 
         qrbox: { width: 240, height: 240 },
         aspectRatio: 1.0,
         experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true // Aceleración por hardware en celular
+          useBarCodeDetectorIfSupported: true
         }
       };
 
@@ -380,13 +445,12 @@
           }
         },
         (errorMessage) => {}
-      ).catch(err => {
-        console.warn("Cámara no disponible:", err);
-      });
+      ).catch(err => console.warn("Cámara no disponible:", err));
     }
 
     window.onload = function() {
       initScanner();
+      cargarDirectorioAlumnos(); // Carga previa de los alumnos
 
       document.getElementById('qr-input-file').addEventListener('change', e => {
         if (e.target.files.length === 0) return;
