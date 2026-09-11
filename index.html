@@ -3,470 +3,238 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Lector QR - Tareas</title>
+  <title>Escáner de Asistencia</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    :root {
-      --primary: #1a73e8;
-      --primary-dark: #1557b0;
-      --bg-color: #f0f2f5;
-      --card-bg: #ffffff;
-      --text-main: #202124;
-      --text-muted: #5f6368;
-      --success-bg: #d4edda;
-      --success-color: #155724;
-      --error-bg: #f8d7da;
-      --error-color: #721c24;
-      --loading-bg: #e8f0fe;
-      --loading-color: #1967d2;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding-bottom: 20px;
-    }
-
-    /* BANNER DE NOTIFICACIÓN FIJO */
-    .status-container {
-      position: sticky;
-      top: 0;
-      width: 100%;
-      max-width: 480px;
-      z-index: 1000;
-      padding: 10px 15px;
-      background-color: var(--bg-color);
-    }
-
-    #status-box {
-      width: 100%;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-size: 15px;
-      text-align: center;
-      display: none;
-      font-weight: 600;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-      animation: fadeIn 0.2s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .success { background-color: var(--success-bg); color: var(--success-color); border: 1.5px solid #c3e6cb; }
-    .error { background-color: var(--error-bg); color: var(--error-color); border: 1.5px solid #f5c6cb; }
-    .loading { background-color: var(--loading-bg); color: var(--loading-color); border: 1.5px solid #aecbfa; }
-
-    .student-name {
-      font-size: 17px;
-      font-weight: 700;
-      margin-top: 4px;
-    }
-
-    .main-card {
-      background: var(--card-bg);
-      width: calc(100% - 30px);
-      max-width: 450px;
-      padding: 18px;
-      border-radius: 16px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
-      margin-top: 2px;
-    }
-
-    .header-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: var(--primary);
-      text-align: center;
-      margin: 0 0 15px 0;
-    }
-
-    label {
-      font-weight: 600;
-      font-size: 13px;
-      color: var(--text-muted);
-      display: block;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    select, input[type="text"], input[type="file"] {
-      width: 100%;
-      padding: 12px 14px;
-      font-size: 16px;
-      border-radius: 10px;
-      border: 1.5px solid #dadce0;
-      background: #fff;
-      margin-bottom: 14px;
-      font-weight: 600;
-      color: var(--text-main);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    select:focus, input[type="text"]:focus {
-      border-color: var(--primary);
-    }
-
-    .nav-tabs {
-      display: flex;
-      background: #e8eaed;
-      border-radius: 10px;
-      padding: 3px;
-      margin-bottom: 15px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 11px;
-      border: none;
-      background: transparent;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .tab-btn.active {
-      background: #fff;
-      color: var(--primary);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    #reader {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--primary);
-      background-color: #000;
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      font-weight: 700;
-      color: #fff;
-      background-color: var(--primary);
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: background 0.2s;
-      box-shadow: 0 4px 8px rgba(26, 115, 232, 0.3);
-      margin-top: 5px;
-    }
-
-    .btn-primary:active {
-      background-color: var(--primary-dark);
-      transform: scale(0.98);
-    }
-
-    .file-input-wrapper {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px dashed #dadce0;
-    }
+    body { background-color: #f3f4f6; }
+    .hidden { display: none !important; }
   </style>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
-<body>
+<body class="p-4 font-sans text-gray-800">
 
-  <!-- Mensaje de Confirmación Fijo -->
-  <div class="status-container">
-    <div id="status-box"></div>
-  </div>
+  <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6 mt-4">
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-4">Control de Acceso</h1>
 
-  <div class="main-card">
-    <div class="header-title">📋 Lector de Tareas QR</div>
-
-    <!-- Selección de Tarea -->
-    <label for="actividadSelect">1. Tarea Activa</label>
-    <select id="actividadSelect">
-      <option value="act01">act01</option>
-      <option value="act02">act02</option>
-      <option value="act03">act03</option>
-      <option value="act04">act04</option>
-      <option value="act05">act05</option>
-      <option value="act06">act06</option>
-      <option value="act07">act07</option>
-      <option value="act08">act08</option>
-      <option value="act09">act09</option>
-      <option value="act10">act10</option>
-      <option value="act11">act11</option>
-      <option value="act12">act12</option>
-      <option value="act13">act13</option>
-      <option value="act14">act14</option>
-      <option value="act15">act15</option>
-      <option value="act16">act16</option>
-      <option value="act17">act17</option>
-      <option value="act18">act18</option>
-      <option value="act19">act19</option>
-      <option value="act20">act20</option>
-      <option value="act21">act21</option>
-      <option value="cohete">cohete</option>
-      <option value="EXAMEN">EXAMEN</option>
-      <option value="PART">PART</option>
-    </select>
-
-    <!-- Navegación QR / Manual -->
-    <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('qr-tab', this)">📷 Cámara QR</button>
-      <button class="tab-btn" onclick="switchTab('manual-tab', this)">✏️ Búsqueda Manual</button>
+    <!-- PANTALLA LOGIN -->
+    <div id="pantallaLogin">
+      <label class="block text-sm font-medium text-gray-700">Nombre del Prefecto/Maestro:</label>
+      <input type="text" id="nombrePrefecto" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm border p-2 focus:border-blue-500 focus:ring-blue-500" placeholder="Ej. Prof. Roberto">
+      <button onclick="iniciarSesion()" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-bold">Iniciar Turno</button>
+      <p id="cargandoAlumnos" class="text-sm text-center text-gray-500 mt-2 hidden">Descargando base de datos...</p>
     </div>
 
-    <!-- PESTAÑA 1: Cámara QR -->
-    <div id="qr-tab" class="tab-content active">
-      <div id="reader"></div>
-      <div class="file-input-wrapper">
-        <label for="qr-input-file">📷 Cargar Foto de Código QR</label>
-        <input type="file" id="qr-input-file" accept="image/*" capture="environment">
+    <!-- PANTALLA PRINCIPAL (Oculta al inicio) -->
+    <div id="pantallaEscaneo" class="hidden">
+      <p class="text-center text-sm font-semibold mb-4 bg-green-100 text-green-800 p-2 rounded" id="infoUsuario"></p>
+
+      <!-- BOTONES NFC Y QR -->
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <button onclick="iniciarNFC()" class="bg-indigo-600 hover:bg-indigo-700 text-white py-4 rounded-xl font-bold flex flex-col items-center shadow-lg">
+          <span class="text-3xl mb-1">📡</span> Escanear NFC
+        </button>
+        <button onclick="alert('Función de cámara QR en desarrollo. Usa registro manual por ahora.')" class="bg-gray-800 hover:bg-gray-900 text-white py-4 rounded-xl font-bold flex flex-col items-center shadow-lg">
+          <span class="text-3xl mb-1">📷</span> Escanear QR
+        </button>
+      </div>
+
+      <div id="estadoNFC" class="text-center text-sm font-bold h-6 mb-4 text-gray-600"></div>
+
+      <!-- SECCIÓN REGISTRO MANUAL / JUSTIFICANTE -->
+      <div class="mt-6 border-t pt-4 border-gray-200">
+        <h3 class="text-lg font-bold text-gray-700 mb-3 text-center">Registro Manual / Justificantes</h3>
+        
+        <!-- Filtros -->
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <select id="filtroTurno" onchange="filtrarAlumnos()" class="border p-2 rounded text-sm"><option value="MATUTINO">Matutino</option><option value="VESPERTINO">Vespertino</option></select>
+          <select id="filtroGrado" onchange="filtrarAlumnos()" class="border p-2 rounded text-sm"><option value="1">1º</option><option value="2">2º</option><option value="3">3º</option></select>
+          <select id="filtroGrupo" onchange="filtrarAlumnos()" class="border p-2 rounded text-sm"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+        </div>
+
+        <select id="selectAlumno" class="w-full border p-2 rounded mb-3 bg-gray-50">
+          <option value="">-- Selecciona un alumno --</option>
+        </select>
+
+        <select id="selectAccion" class="w-full border p-2 rounded mb-3 text-blue-800 font-semibold bg-blue-50">
+          <option value="MANUAL">Asistencia Manual (Olvidó Tarjeta)</option>
+          <option value="JUSTIFICADA">Falta Justificada (Enfermedad/Aviso)</option>
+        </select>
+
+        <input type="text" id="inputObservaciones" class="w-full border p-2 rounded mb-3" placeholder="Observaciones (Opcional)">
+        
+        <button onclick="registrarManual()" class="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-bold shadow">
+          Guardar Registro
+        </button>
+      </div>
+
+      <!-- COLA OFFLINE -->
+      <div id="offlineBanner" class="hidden mt-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 text-xs text-center rounded">
+        Estás sin conexión. Registros en cola: <span id="colaCount" class="font-bold text-red-600">0</span>
       </div>
     </div>
-
-    <!-- PESTAÑA 2: Búsqueda Manual por Grupo/Alumno -->
-    <div id="manual-tab" class="tab-content">
-      
-      <!-- Filtro 1: Grupo / Pestaña -->
-      <label for="grupoSelect">2. Seleccionar Grupo / Pestaña</label>
-      <select id="grupoSelect" onchange="filtrarAlumnos()">
-        <option value="">-- Cargando grupos... --</option>
-      </select>
-
-      <!-- Filtro 2: Escribir para buscar -->
-      <label for="buscarNombreInput">3. Buscar Alumno (Escribe nombre):</label>
-      <input type="text" id="buscarNombreInput" placeholder="Ej. Ricardo..." oninput="filtrarAlumnos()">
-
-      <!-- Lista desplegable de Alumnos filtrados -->
-      <label for="alumnoListaSelect">4. Alumnos Encontrados:</label>
-      <select id="alumnoListaSelect" size="5" style="height: 140px; margin-bottom: 12px;">
-        <option value="">Cargando lista...</option>
-      </select>
-
-      <button class="btn-primary" onclick="registrarManual()">✅ Registrar Tarea Alumno Seleccionado</button>
-    </div>
-
   </div>
 
   <script>
-    // PEGA AQUÍ LA URL DE TU APLICACIÓN WEB DE GOOGLE APPS SCRIPT
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXBAJP3gUDRnkqWXJ4Sht8TEoBcmqeefLDIL-bhMGUqLT16TzjOpunjlduhjj0ZrBM/exec";
-
-    let html5QrCode;
-    let isProcessing = false;
-    let baseDatosAlumnos = []; // Almacena datos descargados de Google Sheets
-
-    function playBeep()  {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const notas = [330, 392, 659, 523, 587, 784];
-    let now = ctx.currentTime;
-
-    notas.forEach(f => {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(f, now);
+    // ⚠️ REEMPLAZA CON TU URL DEL SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwpbh1Isnul9HjLJ3xbHa05gM2eFFYP9pDK_L0_yjiEknYlqJUbDNhLokcw9zDGiEVM/exec"; 
     
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-    
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    
-    osc.start(now);
-    osc.stop(now + 0.08);
-    now += 0.06;
-                      }      );
-    }    
+    let usuarioActivo = "";
+    let baseAlumnos = []; // Guardará la lista de alumnos
+    let colaOffline = JSON.parse(localStorage.getItem('colaAsistencia')) || [];
+    let ultimosEscaneos = {}; // Para Anti-passback
 
-    function showStatus(message, type, alumnoName = "") {
-      const box = document.getElementById('status-box');
-      box.className = type;
-      box.style.display = 'block';
-      let html = message;
-      if (alumnoName) {
-        html += `<div class="student-name">👤 ${alumnoName}</div>`;
-      }
-      box.innerHTML = html;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    // DESCARGAR LISTA DE ALUMNOS DESDE APPS SCRIPT
-    function cargarDirectorioAlumnos() {
-      fetch(SCRIPT_URL)
-        .then(response => response.json())
-        .then(res => {
-          if (res.success && res.datos) {
-            baseDatosAlumnos = res.datos;
-            poblardesplegableGrupos();
-            filtrarAlumnos();
-          }
-        })
-        .catch(err => console.error("Error al cargar lista de alumnos:", err));
-    }
-
-    function poblardesplegableGrupos() {
-      const selectGrupo = document.getElementById('grupoSelect');
-      selectGrupo.innerHTML = '<option value="TODOS">--- Todos los Grupos ---</option>';
+    // Iniciar Sesión y descargar base de datos
+    async function iniciarSesion() {
+      usuarioActivo = document.getElementById("nombrePrefecto").value.trim();
+      if(!usuarioActivo) return alert("Ingresa tu nombre");
       
-      baseDatosAlumnos.forEach(item => {
-        const opt = document.createElement('option');
-        opt.value = item.grupo;
-        opt.textContent = `📁 ${item.grupo} (${item.alumnos.length} alumnos)`;
-        selectGrupo.appendChild(opt);
+      document.getElementById("cargandoAlumnos").classList.remove("hidden");
+      
+      try {
+        // Descargar alumnos para el registro manual
+        const res = await fetch(APPS_SCRIPT_URL + "?action=getAlumnos");
+        baseAlumnos = await res.json();
+        // Guardar copia local por si se quedan sin internet
+        localStorage.setItem("alumnosCache", JSON.stringify(baseAlumnos));
+      } catch (err) {
+        // Si no hay internet al iniciar, cargar caché
+        baseAlumnos = JSON.parse(localStorage.getItem("alumnosCache") || "[]");
+        if(baseAlumnos.length === 0) alert("Sin conexión y sin datos locales para lista manual.");
+      }
+
+      document.getElementById("pantallaLogin").classList.add("hidden");
+      document.getElementById("pantallaEscaneo").classList.remove("hidden");
+      document.getElementById("infoUsuario").innerText = "Activo: " + usuarioActivo;
+      
+      filtrarAlumnos(); // Llenar el selector manual con los filtros por defecto
+      actualizarUIOffline();
+    }
+
+    // Filtrar dropdown de alumnos
+    function filtrarAlumnos() {
+      const turno = document.getElementById("filtroTurno").value;
+      const grado = document.getElementById("filtroGrado").value;
+      const grupo = document.getElementById("filtroGrupo").value;
+      
+      const select = document.getElementById("selectAlumno");
+      select.innerHTML = '<option value="">-- Selecciona un alumno --</option>';
+      
+      const filtrados = baseAlumnos.filter(a => a.turno === turno && a.grado === grado && a.grupo === grupo);
+      
+      filtrados.forEach(a => {
+        let opt = document.createElement("option");
+        opt.value = a.id;
+        opt.text = a.nombre;
+        select.appendChild(opt);
       });
     }
 
-    function filtrarAlumnos() {
-      const grupoSeleccionado = document.getElementById('grupoSelect').value;
-      const textoBusqueda = document.getElementById('buscarNombreInput').value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-      const selectAlumnos = document.getElementById('alumnoListaSelect');
-      selectAlumnos.innerHTML = '';
-
-      let contador = 0;
-
-      baseDatosAlumnos.forEach(item => {
-        // Si hay grupo seleccionado y no coincide, saltar
-        if (grupoSeleccionado && grupoSeleccionado !== "TODOS" && item.grupo !== grupoSeleccionado) return;
-
-        item.alumnos.forEach(nombre => {
-          const nombreLimpio = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          if (!textoBusqueda || nombreLimpio.includes(textoBusqueda)) {
-            const opt = document.createElement('option');
-            opt.value = `${nombre}|${item.grupo}`;
-            opt.textContent = `${nombre} [${item.grupo}]`;
-            selectAlumnos.appendChild(opt);
-            contador++;
+    // Lógica NFC (Igual que antes pero optimizada)
+    async function iniciarNFC() {
+      if (!("NDEFReader" in window)) return alert("NFC no soportado en este dispositivo (Usa Chrome en Android).");
+      const estado = document.getElementById("estadoNFC");
+      try {
+        const ndef = new NDEFReader();
+        await ndef.scan();
+        estado.innerText = "Acerca la tarjeta al teléfono...";
+        estado.className = "text-center text-sm font-bold h-6 mb-4 text-blue-600 animate-pulse";
+        
+        ndef.addEventListener("reading", ({ message }) => {
+          for (const record of message.records) {
+            const textDecoder = new TextDecoder(record.encoding);
+            const idNfc = textDecoder.decode(record.data);
+            procesarEscaneo(idNfc, "ESCANEO_NFC", "");
           }
         });
-      });
-
-      if (contador === 0) {
-        const opt = document.createElement('option');
-        opt.value = "";
-        opt.textContent = "Sin coincidencias";
-        selectAlumnos.appendChild(opt);
+      } catch (error) {
+        estado.innerText = "Error NFC: " + error;
       }
     }
 
-    function sendDataToSheets(qrData) {
-      if (isProcessing) return;
-      isProcessing = true;
-
-      const actividad = document.getElementById('actividadSelect').value;
-      showStatus("⏳ Guardando en Google Sheets...", "loading");
-
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ qrData: qrData, actividad: actividad })
-      })
-      .then(response => response.json())
-      .then(res => {
-        if (res.success) {
-          playBeep();
-          showStatus(`✅ <strong>${res.actividad}</strong> asignada en <strong>${res.hoja}</strong>`, "success", res.alumno);
-          setTimeout(() => { isProcessing = false; }, 1800);
-        } else {
-          showStatus(`⚠️ ${res.message}`, "error");
-          setTimeout(() => { isProcessing = false; }, 1500);
-        }
-      })
-      .catch(err => {
-        isProcessing = false;
-        showStatus(`❌ Error de conexión: ${err.message}`, "error");
-      });
+    // Registro Manual / Justificante desde la interfaz
+    function registrarManual() {
+      const idNfc = document.getElementById("selectAlumno").value;
+      const accion = document.getElementById("selectAccion").value;
+      const obs = document.getElementById("inputObservaciones").value;
+      
+      if(!idNfc) return alert("Por favor selecciona un alumno.");
+      
+      procesarEscaneo(idNfc, accion, obs);
+      
+      // Limpiar campos
+      document.getElementById("selectAlumno").value = "";
+      document.getElementById("inputObservaciones").value = "";
     }
 
-    function registrarManual() {
-      const selectAlumnos = document.getElementById('alumnoListaSelect');
-      const valorSeleccionado = selectAlumnos.value;
-      
-      if (!valorSeleccionado) {
-        showStatus("⚠️ Por favor selecciona un alumno de la lista.", "error");
+    // Procesamiento Central
+    function procesarEscaneo(idNfc, accion, observaciones) {
+      // 1. Anti-Passback (Prevenir doble registro en menos de 10 mins)
+      const ahora = Date.now();
+      if (ultimosEscaneos[idNfc] && (ahora - ultimosEscaneos[idNfc] < 600000)) {
+        if ("vibrate" in navigator) navigator.vibrate([100, 50, 100]);
+        alert("⚠️ TARJETA YA REGISTRADA HACE MENOS DE 10 MINUTOS.");
         return;
       }
+      
+      ultimosEscaneos[idNfc] = ahora;
+      if ("vibrate" in navigator) navigator.vibrate(200);
 
-      sendDataToSheets(valorSeleccionado);
-    }
+      const payload = { accion, idNfc, registradoPor: usuarioActivo, observaciones };
 
-    function switchTab(tabId, btnElement) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-
-      document.getElementById(tabId).classList.add('active');
-      btnElement.classList.add('active');
-
-      if (tabId === 'qr-tab') {
-        initScanner();
+      // 2. Verificar red
+      if (navigator.onLine) {
+        enviarAGoogle(payload);
       } else {
-        if (html5QrCode && html5QrCode.isScanning) {
-          html5QrCode.stop().catch(err => console.log(err));
-        }
+        colaOffline.push(payload);
+        localStorage.setItem('colaAsistencia', JSON.stringify(colaOffline));
+        actualizarUIOffline();
+        alert("Sin internet. Guardado localmente.");
       }
     }
 
-    function initScanner() {
-      if (!html5QrCode) {
-        html5QrCode = new Html5Qrcode("reader");
-      }
-
-      const config = {
-        fps: 25, 
-        qrbox: { width: 240, height: 240 },
-        aspectRatio: 1.0,
-        experimentalFeatures: {
-          useBarCodeDetectorIfSupported: true
-        }
-      };
-
-      html5QrCode.start(
-        { facingMode: "environment" },
-        config,
-        (decodedText) => {
-          if (!isProcessing) {
-            sendDataToSheets(decodedText);
-          }
-        },
-        (errorMessage) => {}
-      ).catch(err => console.warn("Cámara no disponible:", err));
-    }
-
-    window.onload = function() {
-      initScanner();
-      cargarDirectorioAlumnos(); // Carga previa de los alumnos
-
-      document.getElementById('qr-input-file').addEventListener('change', e => {
-        if (e.target.files.length === 0) return;
-        if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
-        
-        html5QrCode.scanFile(e.target.files[0], true)
-          .then(decodedText => { sendDataToSheets(decodedText); })
-          .catch(err => { showStatus("⚠️ No se detectó código QR en la imagen.", "error"); });
+    function enviarAGoogle(payload) {
+      document.getElementById("estadoNFC").innerText = "Enviando...";
+      fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("estadoNFC").innerText = "¡Listo!";
+        alert(data.message);
+      })
+      .catch(err => {
+        colaOffline.push(payload);
+        localStorage.setItem('colaAsistencia', JSON.stringify(colaOffline));
+        actualizarUIOffline();
       });
-    };
+    }
+
+    // Sincronización automática de la cola cuando regresa internet
+    window.addEventListener('online', () => {
+      if(colaOffline.length > 0) {
+        const tempCola = [...colaOffline];
+        colaOffline = [];
+        localStorage.removeItem('colaAsistencia');
+        actualizarUIOffline();
+        
+        tempCola.forEach(payload => {
+          fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+        });
+        alert("Conexión restaurada. Sincronizando registros atrasados.");
+      }
+    });
+
+    window.addEventListener('offline', actualizarUIOffline);
+
+    function actualizarUIOffline() {
+      const banner = document.getElementById("offlineBanner");
+      if (!navigator.onLine || colaOffline.length > 0) {
+        banner.classList.remove("hidden");
+        document.getElementById("colaCount").innerText = colaOffline.length;
+      } else {
+        banner.classList.add("hidden");
+      }
+    }
   </script>
 </body>
 </html>
